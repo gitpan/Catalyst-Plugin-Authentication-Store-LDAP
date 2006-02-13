@@ -1,0 +1,10 @@
+0.01 adam Thu Feb  8 14:28:18 2006  
+    - initial revision
+    - supports authentication
+    - supports roles
+
+0.02 adam Fri Feb 10 14:10:23 PST 2006
+    - Now throws an exception if the initial bind fails
+    - Changed the default role_filter from (member=%s) to (memberUid=%s)
+    - Fixed bug in Backend->lookup_user that was not properly handling
+      when a user was not found in the backing store at all.
