@@ -8,3 +8,6 @@
     - Changed the default role_filter from (member=%s) to (memberUid=%s)
     - Fixed bug in Backend->lookup_user that was not properly handling
       when a user was not found in the backing store at all.
+
+0.03 adam Fri Feb 17 09:51:36 PST 2006
+    - Gavin Henry's documentation patch for YAML configuration

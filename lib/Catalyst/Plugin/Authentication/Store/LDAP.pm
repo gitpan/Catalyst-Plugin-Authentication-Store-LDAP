@@ -5,7 +5,7 @@ package Catalyst::Plugin::Authentication::Store::LDAP;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Catalyst::Plugin::Authentication::Store::LDAP::Backend;
 
@@ -96,6 +96,47 @@ It authenticates users in two steps:
    Assuming this is successful, the user is Authenticated.  
 
 =head1 CONFIGURATION OPTIONS
+
+=head2 Configuring with YAML
+
+Set Configuration to be loaded via Config.yml in YourApp.pm
+
+    use YAML qw(LoadFile);
+    use Path::Class 'file';
+
+    __PACKAGE__->config(
+        LoadFile(
+            file(__PACKAGE__->config->{home}, 'Config.yml')
+        )
+    );
+
+Settings in Config.yml
+
+    # Config for Store::LDAP
+    authentication:
+        ldap:
+            ldap_server: ldap.yourcompany.com
+            ldap_server_options:
+                - timeout: 30
+            binddn: anonymous
+            bindpw: dontcarehow
+            start_tls: 1
+            start_tls_options:
+                - verify: none
+            user_basedn: ou=people,dc=yourcompany,dc=com
+            user_filter: (&(objectClass=posixAccount)(uid=%s))
+            user_scope: one
+            user_field: uid
+            user_search_options:
+                - deref: always
+            use_roles: 1
+            role_basedn: ou=groups,ou=OxObjects,dc=yourcompany,dc=com
+            role_filter: (&(objectClass=posixGroup)(memberUid=%s))
+            role_scope: one
+            role_field: uid
+            role_value: dn
+            role_search_options:
+                - deref: always
 
 =head2 ldap_server
 

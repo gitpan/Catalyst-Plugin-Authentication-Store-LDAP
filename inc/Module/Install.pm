@@ -1,4 +1,4 @@
-#line 1 "inc/Module/Install.pm - /Library/Perl/5.8.6/Module/Install.pm"
+#line 1 "inc/Module/Install.pm - /site/perl/perl-5.8.6/lib/site_perl/5.8.6/Module/Install.pm"
 package Module::Install;
 $VERSION = '0.39';
 
