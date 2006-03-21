@@ -96,7 +96,10 @@ Also sets a few sensible defaults.
 
 sub new {
     my ($class, $config) = @_;
-
+    
+    unless (defined($config) && ref($config) eq "HASH") {
+        Catalyst::Exception->throw("Catalyst::Plugin::Authentication::Store::LDAP::Backend needs to be configured with a hashref."); 
+    }
     my %config_hash = %{$config};
     $config_hash{'binddn'}      ||= 'anonymous';
     $config_hash{'user_filter'} ||= '(uid=%s)';

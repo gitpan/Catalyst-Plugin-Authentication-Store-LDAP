@@ -11,3 +11,8 @@
 
 0.03 adam Fri Feb 17 09:51:36 PST 2006
     - Gavin Henry's documentation patch for YAML configuration
+
+0.04 adam Tue Mar 21 15:31:57 PST 2006
+    - Fixed rt.cpan.org #18250, sample YAML config incorrectly using arrays
+    - Added some error checking around whether or not we have been properly
+      configured.

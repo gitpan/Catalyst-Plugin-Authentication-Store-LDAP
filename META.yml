@@ -1,5 +1,5 @@
 name: Catalyst-Plugin-Authentication-Store-LDAP
-version: 0.03
+version: 0.04
 abstract: Authenticate Users against LDAP Directories
 author: Adam Jacob <holoway@cpan.org>
 license: perl

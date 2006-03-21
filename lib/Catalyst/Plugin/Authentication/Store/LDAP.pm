@@ -5,12 +5,20 @@ package Catalyst::Plugin::Authentication::Store::LDAP;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Catalyst::Plugin::Authentication::Store::LDAP::Backend;
 
 sub setup {
     my $c = shift;
+
+    if (exists($c->config->{'authentication'})) {
+        unless (exists($c->config->{'authentication'}->{'ldap'})) {
+            Catalyst::Exception->throw("I require \$c->config->{'authentication'}->{'ldap'} to be configured.");
+        }
+    } else {
+        Catalyst::Exception->throw("I require \$c->config->{'authentication'}->{'ldap'} to be configured.");
+    }
 
     $c->default_auth_store(
         Catalyst::Plugin::Authentication::Store::LDAP::Backend->new(
@@ -117,18 +125,18 @@ Settings in Config.yml
         ldap:
             ldap_server: ldap.yourcompany.com
             ldap_server_options:
-                - timeout: 30
+                timeout: 30
             binddn: anonymous
             bindpw: dontcarehow
             start_tls: 1
             start_tls_options:
-                - verify: none
+                verify: none
             user_basedn: ou=people,dc=yourcompany,dc=com
             user_filter: (&(objectClass=posixAccount)(uid=%s))
             user_scope: one
             user_field: uid
             user_search_options:
-                - deref: always
+                deref: always
             use_roles: 1
             role_basedn: ou=groups,ou=OxObjects,dc=yourcompany,dc=com
             role_filter: (&(objectClass=posixGroup)(memberUid=%s))
@@ -136,7 +144,7 @@ Settings in Config.yml
             role_field: uid
             role_value: dn
             role_search_options:
-                - deref: always
+                deref: always
 
 =head2 ldap_server
 
