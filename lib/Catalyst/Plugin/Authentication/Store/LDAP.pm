@@ -5,28 +5,14 @@ package Catalyst::Plugin::Authentication::Store::LDAP;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.0600';
 
 use Catalyst::Plugin::Authentication::Store::LDAP::Backend;
 
-sub setup {
-    my $c = shift;
-
-    if (exists($c->config->{'authentication'})) {
-        unless (exists($c->config->{'authentication'}->{'ldap'})) {
-            Catalyst::Exception->throw("I require \$c->config->{'authentication'}->{'ldap'} to be configured.");
-        }
-    } else {
-        Catalyst::Exception->throw("I require \$c->config->{'authentication'}->{'ldap'} to be configured.");
-    }
-
-    $c->default_auth_store(
-        Catalyst::Plugin::Authentication::Store::LDAP::Backend->new(
-            $c->config->{'authentication'}->{'ldap'}
-        )
-    );
-
-	$c->NEXT::setup(@_);
+sub new {
+    my ( $class, $config, $app ) = @_;
+    return Catalyst::Plugin::Authentication::Store::LDAP::Backend->new(
+        $config);
 }
 
 __PACKAGE__;
@@ -49,42 +35,49 @@ Catalyst::Plugin::Authentication::Store::LDAP
       /;
 
     __PACKAGE__->config(
-        'authentication' => {
-            'ldap' => {
-                'ldap_server' => 'ldap.yourcompany.com',
-                'ldap_server_options' => {
-                    'timeout' => 30,
-                },
-                'binddn' => 'anonymous',
-                'bindpw' => 'dontcarehow',
-                'start_tls' => 1,
-                'start_tls_options' => {
-                    'verify' => 'none',
-                },
-                'user_basedn' => 'ou=people,dc=yourcompany,dc=com',
-                'user_filter' => '(&(objectClass=posixAccount)(uid=%s))',
-                'user_scope' => 'one',
-                'user_field' => 'uid',
-                'user_search_options' => {
-                    'deref' => 'always',
-                },
-                'use_roles' => 1,
-                'role_basedn' => 'ou=groups,dc=yourcompany,dc=com',
-                'role_filter' => '(&(objectClass=posixGroup)(memberUid=%s))',
-                'role_scope' => 'one',
-                'role_field' => 'uid',
-                'role_value' => 'dn',
-                'role_search_options' => {
-                    'deref' => 'always',
-                },
-            }
-        },
+      'authentication' => {
+         default_realm => "ldap",
+         realms => {
+           ldap => {
+             credential => {
+               class => "Password",
+               password_field => "password",
+               password_type => "self_check",
+             },
+             store => {
+               binddn              => "anonymous",
+               bindpw              => "dontcarehow",
+               class               => "LDAP",
+               ldap_server         => "ldap.yourcompany.com",
+               ldap_server_options => { timeout => 30 },
+               role_basedn         => "ou=groups,ou=OxObjects,dc=yourcompany,dc=com",
+               role_field          => "uid",
+               role_filter         => "(&(objectClass=posixGroup)(memberUid=%s))",
+               role_scope          => "one",
+               role_search_options => { deref => "always" },
+               role_value          => "dn",
+               start_tls           => 1,
+               start_tls_options   => { verify => "none" },
+               entry_class         => "MyApp::LDAP::Entry",
+               use_roles           => 1,
+               user_basedn         => "ou=people,dc=yourcompany,dc=com",
+               user_field          => "uid",
+               user_filter         => "(&(objectClass=posixAccount)(uid=%s))",
+               user_scope          => "one",
+               user_search_options => { deref => "always" },
+             },
+           },
+         },
+       },
     );
 
     sub login : Global {
         my ( $self, $c ) = @_;
 
-        $c->login( $c->req->param("login"), $c->req->param("password"), );
+        $c->authenticate({
+                          id          => $c->req->param("login"), 
+                          password    => $c->req->param("password") 
+                         });
         $c->res->body("Welcome " . $c->user->username . "!");
     }
 
@@ -122,29 +115,38 @@ Settings in Config.yml
 
     # Config for Store::LDAP
     authentication:
-        ldap:
-            ldap_server: ldap.yourcompany.com
-            ldap_server_options:
-                timeout: 30
-            binddn: anonymous
-            bindpw: dontcarehow
-            start_tls: 1
-            start_tls_options:
-                verify: none
-            user_basedn: ou=people,dc=yourcompany,dc=com
-            user_filter: (&(objectClass=posixAccount)(uid=%s))
-            user_scope: one
-            user_field: uid
-            user_search_options:
-                deref: always
-            use_roles: 1
-            role_basedn: ou=groups,ou=OxObjects,dc=yourcompany,dc=com
-            role_filter: (&(objectClass=posixGroup)(memberUid=%s))
-            role_scope: one
-            role_field: uid
-            role_value: dn
-            role_search_options:
-                deref: always
+        default_realm: ldap
+        realms:
+            ldap:
+                credential:
+                    class: Password
+                    password_field: password
+                    password_type:  self_check
+                store:
+                    class: LDAP
+                    ldap_server: ldap.yourcompany.com
+                    ldap_server_options:
+                        timeout: 30
+                    binddn: anonymous
+                    bindpw: dontcarehow
+                    start_tls: 1
+                    start_tls_options:
+                        verify: none
+                    user_basedn: ou=people,dc=yourcompany,dc=com
+                    user_filter: (&(objectClass=posixAccount)(uid=%s))
+                    user_scope: one
+                    user_field: uid
+                    user_search_options:
+                        deref: always
+                    use_roles: 1
+                    role_basedn: ou=groups,ou=OxObjects,dc=yourcompany,dc=com
+                    role_filter: (&(objectClass=posixGroup)(memberUid=%s))
+                    role_scope: one
+                    role_field: uid
+                    role_value: dn
+                    role_search_options:
+                        deref: always
+
 
 =head2 ldap_server
 
@@ -202,7 +204,9 @@ This is the attribute of the returned LDAP object we will use for their
 
     (&(objectClass=User)(cn=%s))
 
-You would probably set this to "cn".
+You would probably set this to "cn". You can also set it to an array,
+to allow more than one login field. The first field will be returned
+as identifier for the user.
 
 =head2 user_search_options
 
@@ -267,7 +271,7 @@ As they are already taken care of by other configuration options.
 
 =head1 METHODS
 
-=head2 setup
+=head2 new
 
 This method will populate
 L<Catalyst::Plugin::Authentication/default_auth_store> with this object. 
@@ -277,7 +281,9 @@ L<Catalyst::Plugin::Authentication/default_auth_store> with this object.
 Adam Jacob <holoway@cpan.org>
 
 Some parts stolen shamelessly and entirely from
-L<Catalyst::Plugin::Authentication::Store::Htpasswd>. 
+L<Catalyst::Plugin::Authentication::Store::Htpasswd>.
+
+Realms API patches from Peter Karman <karman@cpan.org>.
 
 =head1 THANKS
 

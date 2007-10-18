@@ -45,6 +45,8 @@ use base qw/Catalyst::Plugin::Authentication::User Class::Accessor::Fast/;
 use strict;
 use warnings;
 
+our $VERSION = '0.0600';
+
 BEGIN { __PACKAGE__->mk_accessors(qw/user store/) }
 
 use overload '""' => sub { shift->stringify }, fallback => 1;
@@ -93,6 +95,7 @@ of the L<Net::LDAP::Entry> object.
 sub stringify {
     my ($self) = @_;
     my $userfield = $self->store->user_field;
+    $userfield=$$userfield[0] if ref $userfield eq 'ARRAY';
     if ($userfield eq "dn") {
         my ($string) = $self->user->ldap_entry->dn;
         return $string;
@@ -101,6 +104,12 @@ sub stringify {
         return $string;
     }
 }
+
+=head2 supported_features
+
+Returns hashref of features that this Authentication::User subclass supports.
+
+=cut
 
 sub supported_features {
     return {
@@ -138,6 +147,12 @@ sub roles {
     my $self = shift;
     return $self->store->lookup_roles($self);
 }
+
+=head2 for_session
+
+Returns the User object, stringified.
+
+=cut
 
 sub for_session {
     my $self = shift;
@@ -265,6 +280,8 @@ Adam Jacob <holoway@cpan.org>
 
 Some parts stolen shamelessly and entirely from
 L<Catalyst::Plugin::Authentication::Store::Htpasswd>. 
+
+Realms API patches from Peter Karman <karman@cpan.org>.
 
 =head1 THANKS
 

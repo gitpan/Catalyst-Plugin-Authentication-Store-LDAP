@@ -8,6 +8,7 @@ license('perl');
 
 requires('Net::LDAP');
 requires('Catalyst::Plugin::Authentication');
+requires('Catalyst::Model::LDAP');
 build_requires('Test::More');
 
 auto_install();

@@ -35,6 +35,7 @@ Catalyst::Plugin::Authentication::Store::LDAP::Backend
             'user_search_options' => {
                 'deref' => 'always',
             },
+            'entry_class' => 'MyApp::LDAP::Entry',
             'use_roles' => 1,
             'role_basedn' => 'ou=groups,dc=yourcompany,dc=com',
             'role_filter' => '(&(objectClass=posixGroup)(member=%s))',
@@ -75,12 +76,14 @@ use base qw/Class::Accessor::Fast/;
 use strict;
 use warnings;
 
+our $VERSION = '0.0600';
+
 use Catalyst::Plugin::Authentication::Store::LDAP::User;
 use Net::LDAP;
 
 BEGIN {
     __PACKAGE__->mk_accessors(
-        qw/ldap_server ldap_server_options binddn bindpw user_search_options user_filter user_basedn user_scope user_field use_roles role_basedn role_filter role_scope role_field role_value role_search_options start_tls start_tls_options/
+        qw/ldap_server ldap_server_options binddn bindpw entry_class user_search_options user_filter user_basedn user_scope user_attrs user_field use_roles role_basedn role_filter role_scope role_field role_value role_search_options start_tls start_tls_options/
     );
 }
 
@@ -110,10 +113,29 @@ sub new {
     $config_hash{'role_field'}  ||= 'cn';
     $config_hash{'use_roles'}   ||= '1';
     $config_hash{'start_tls'}   ||= '0';
+    $config_hash{'entry_class'} ||= 'Catalyst::Model::LDAP::Entry';
+    
     my $self = \%config_hash;
     bless($self, $class);
     return $self;
 }
+
+=head2 find_user( I<authinfo> )
+
+Creates a L<Catalyst::Plugin::Authentication::Store::LDAP::User> object
+for the given User ID.  This is the preferred mechanism for getting a 
+given User out of the Store.
+
+I<authinfo> should be a hashref with a key of either C<id> or
+C<username>. The value will be compared against the LDAP C<user_field> field.
+
+=cut
+
+sub find_user {
+    my ( $self, $authinfo, $c ) = @_;
+    return $self->get_user( $authinfo->{id} || $authinfo->{username} );
+}
+
 
 =head2 get_user($id)
 
@@ -250,11 +272,15 @@ sub lookup_user {
         Catalyst::Exception->throw("LDAP Error while searching for user: " . $usersearch->error);
     }
     my $userentry;
+    my $user_field=$self->user_field;
+    my @user_fields=ref $user_field eq 'ARRAY' ? @$user_field : ( $user_field) ;
   RESULT: while (my $entry = $usersearch->pop_entry) {
-        foreach my $value ($entry->get_value($self->user_field)) {
-            if ($value eq $id) {
-                $userentry = $entry;
-                last RESULT;
+        foreach my $field (@user_fields) {
+            foreach my $value ($entry->get_value($field)) {
+                if ($value eq $id) {
+                    $userentry = $entry;
+                    last RESULT;
+                }
             }
         }
     }
@@ -271,6 +297,14 @@ sub lookup_user {
         } else {
             $attrhash->{ lc($attr) } = \@attrvalues;
         }
+    }
+    my $load_class = $self->entry_class . ".pm";
+    $load_class =~ s|::|/|g;
+    
+    eval { require $load_class };
+    if(!$@) {
+        bless($userentry,$self->entry_class);
+        $userentry->{_use_unicode}++;
     }
     my $rv = {
         'ldap_entry' => $userentry,
@@ -334,12 +368,25 @@ sub _replace_filter {
     return $filter;
 }
 
+=head2 user_supports
+
+Returns the value of 
+Catalyst::Plugin::Authentication::Store::LDAP::User->supports(@_).
+
+=cut
+
 sub user_supports {
     my $self = shift;
 
     # this can work as a class method
     Catalyst::Plugin::Authentication::Store::LDAP::User->supports(@_);
 }
+
+=head2 from_session( I<id> )
+
+Returns get_user() for I<id>.
+
+=cut
 
 sub from_session {
     my ($self, $c, $id) = @_;
@@ -355,7 +402,9 @@ __END__
 Adam Jacob <holoway@cpan.org>
 
 Some parts stolen shamelessly and entirely from
-L<Catalyst::Plugin::Authentication::Store::Htpasswd>. 
+L<Catalyst::Plugin::Authentication::Store::Htpasswd>.
+
+Realms API patches from Peter Karman <karman@cpan.org>.
 
 =head1 THANKS
 
