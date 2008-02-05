@@ -20,8 +20,10 @@ my $back = Catalyst::Plugin::Authentication::Store::LDAP::Backend->new(
         'use_roles'   => 0,
     }
 );
+
 isa_ok( $back, "Catalyst::Plugin::Authentication::Store::LDAP::Backend" );
 my $user = $back->find_user( { username => 'kurt' } );
 isa_ok( $user, "Catalyst::Plugin::Authentication::Store::LDAP::User" );
 my $displayname = $user->displayname;
 cmp_ok( $displayname, 'eq', 'Kurt Zeilenga', 'Should be Kurt Zeilenga' );
+

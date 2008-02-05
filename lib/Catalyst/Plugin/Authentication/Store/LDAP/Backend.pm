@@ -3,7 +3,7 @@
 =head1 NAME
 
 Catalyst::Plugin::Authentication::Store::LDAP::Backend 
-  - LDAP authentication storage backend.
+  - LDAP authentication storage backend **DEPRECATED**
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,8 @@ Catalyst::Plugin::Authentication::Store::LDAP::Backend
 
 =head1 DESCRIPTION
 
+B<This module is deprecated. Please use L<Catalyst::Authentication::Store::LDAP> instead.>
+
 You probably want L<Catalyst::Plugin::Authentication::Store::LDAP>, unless
 you are mixing several stores in a single app and one of them is LDAP.
 
@@ -76,7 +78,7 @@ use base qw/Class::Accessor::Fast/;
 use strict;
 use warnings;
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 use Catalyst::Plugin::Authentication::Store::LDAP::User;
 use Net::LDAP;

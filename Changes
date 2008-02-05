@@ -1,4 +1,12 @@
-0.0600  omega Thu Aug 09 09:22:00 CET 2007
+0.0601  karman  4 Feb 2008
+    - marked as deprecated in favor of Catalyst::Authentication::Store::LDAP
+    - changed release date for 0.0600
+    - added AD config suggestions from matija@serverflow.com
+    - bumped req base Auth package to 0.10002
+    - added timeout checks to tests since openldap.org might not be available
+
+
+0.0600  karman 18 Oct 2007 [was: omega Thu Aug 09 09:22:00 CET 2007]
     - Someone had put some 0.052 version out, need to bump past that
     - Add realms API support to match newest C::P::Authentication API. (karman)
     - Add POD tests. (karman)

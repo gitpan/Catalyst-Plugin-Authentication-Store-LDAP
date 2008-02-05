@@ -5,7 +5,7 @@ package Catalyst::Plugin::Authentication::Store::LDAP;
 use strict;
 use warnings;
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 use Catalyst::Plugin::Authentication::Store::LDAP::Backend;
 
@@ -24,7 +24,7 @@ __END__
 =head1 NAME
 
 Catalyst::Plugin::Authentication::Store::LDAP 
-  - Authentication from an LDAP Directory.
+  - Authentication from an LDAP Directory **DEPRECATED**
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,11 @@ Catalyst::Plugin::Authentication::Store::LDAP
 
 =head1 DESCRIPTION
 
+B<This module is deprecated. Please use L<Catalyst::Authentication::Store::LDAP> instead.>
+
+This plugin implements the L<Catalyst::Plugin::Authentication> v.10 API. Read that documentation first if
+you are upgrading from a previous version of this plugin.
+
 This plugin uses C<Net::LDAP> to let your application authenticate against
 an LDAP directory.  It has a pretty high degree of flexibility, given the 
 wide variation of LDAP directories and schemas from one system to another. 
@@ -111,7 +116,7 @@ Set Configuration to be loaded via Config.yml in YourApp.pm
         )
     );
 
-Settings in Config.yml
+Settings in Config.yml (adapt these to whatever configuration format you use):
 
     # Config for Store::LDAP
     authentication:
@@ -147,6 +152,17 @@ Settings in Config.yml
                     role_search_options:
                         deref: always
 
+
+B<NOTE:> The settings above reflect the default values for OpenLDAP. If you
+are using Active Directory instead, Matija Grabnar suggests that the following
+tweeks to the example configuration will work:
+
+    user_basedn: ou=Domain Users,ou=Accounts,dc=mycompany,dc=com
+    user_field:  samaccountname
+    user_filter: (sAMAccountName=%s) 
+
+He also notes: "I found the case in the value of user_field to be significant: 
+it didn't seem to work when I had the mixed case value there."
 
 =head2 ldap_server
 

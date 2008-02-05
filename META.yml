@@ -1,10 +1,11 @@
 --- 
 abstract: Authenticate Users against LDAP Directories
-author: Adam Jacob <holoway@cpan.org>
+author: 
+  - Adam Jacob <holoway@cpan.org>
 build_requires: 
   Test::More: 0
 distribution_type: module
-generated_by: Module::Install version 0.67
+generated_by: Module::Install version 0.68
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.3.html
@@ -16,6 +17,6 @@ no_index:
     - t
 requires: 
   Catalyst::Model::LDAP: 0
-  Catalyst::Plugin::Authentication: 0
+  Catalyst::Plugin::Authentication: 0.10002
   Net::LDAP: 0
-version: 0.0600
+version: 0.0601

@@ -3,7 +3,7 @@
 =head1 NAME
 
 Catalyst::Plugin::Authentication::Store::LDAP::User
- - A User object representing an LDAP object. 
+ - A User object representing an LDAP object **DEPRECATED**
 
 =head1 SYNOPSIS
 
@@ -20,6 +20,8 @@ If you access just $c->user in a scalar context, it will return the current
 username.
 
 =head1 DESCRIPTION
+
+B<This module is deprecated. Please use L<Catalyst::Authentication::Store::LDAP> instead.>
 
 This wraps up an LDAP object and presents a simplified interface to it's
 contents.  It uses some AUTOLOAD magic to pass method calls it doesn't
@@ -45,7 +47,7 @@ use base qw/Catalyst::Plugin::Authentication::User Class::Accessor::Fast/;
 use strict;
 use warnings;
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 BEGIN { __PACKAGE__->mk_accessors(qw/user store/) }
 
