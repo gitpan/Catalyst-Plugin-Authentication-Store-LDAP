@@ -1,6 +1,5 @@
 Changes
-inc/ExtUtils/AutoInstall.pm
-#inc/Module/AutoInstall.pm
+inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
@@ -14,12 +13,12 @@ inc/Module/Install/WriteAll.pm
 lib/Catalyst/Plugin/Authentication/Store/LDAP.pm
 lib/Catalyst/Plugin/Authentication/Store/LDAP/Backend.pm
 lib/Catalyst/Plugin/Authentication/Store/LDAP/User.pm
+Makefile.old
 Makefile.PL
 MANIFEST			This list of files
 META.yml
-t/entry_class.t
+README
 t/lib/EntryClass.pm
-t/01-pre_realms_api.t
-t/02-realms_api.t
 t/pod-coverage.t
 t/pod.t
+TODO
